@@ -1,6 +1,5 @@
-<!-- [//]: # (Image References) -->
-
 [image1]: https://user-images.githubusercontent.com/10624937/42135619-d90f2f28-7d12-11e8-8823-82b970a54d7e.gif "Trained Agent"
+[Udacity repository]: https://github.com/udacity/deep-reinforcement-learning#dependencies
 
 # Project 1: Navigation
 
@@ -23,7 +22,9 @@ The task is episodic, and in order to solve the environment, the agent must get 
 
 ### Getting Started
 
-1. Download the environment from one of the links below.  You need only select the environment that matches your operating system:
+1. Follow the instructions on the [Udacity repository] to configure a Python environment with the dependencies and Unity environments.
+1. Clone this project and ensure it can be ran with the Python environment.
+1. Download the Banana environment from one of the links below.  You need only select the environment that matches your operating system:
     - Linux: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux.zip)
     - Mac OSX: [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana.app.zip)
     - Windows (32-bit): [click here](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Windows_x86.zip)
@@ -33,8 +34,6 @@ The task is episodic, and in order to solve the environment, the agent must get 
 
     (_For AWS_) If you'd like to train the agent on AWS (and have not [enabled a virtual screen](https://github.com/Unity-Technologies/ml-agents/blob/master/docs/Training-on-Amazon-Web-Service.md)), then please use [this link](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P1/Banana/Banana_Linux_NoVis.zip) to obtain the environment.
 
-1. Place the file in the root directory of the project submission and unzip the file.
+1. Place the file in the root directory of this repo and unzip the file.
 
-### Instructions
-
-Follow the instructions in `Navigation.ipynb` to get started with training the agent.
+1. Follow the instructions in the project [report](https://github.com/jknagin/Udacity-DRLND-P1-Navigation/blob/master/Report.md#running-navigationipynb) and the main Jupyter [notebook](https://github.com/jknagin/Udacity-DRLND-P1-Navigation/blob/master/Navigation.ipynb) to get started with training the agent.
