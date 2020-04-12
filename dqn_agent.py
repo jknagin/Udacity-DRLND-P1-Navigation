@@ -1,34 +1,33 @@
 import numpy as np
 import random
 from collections import namedtuple, deque
-
 from model import QNetwork
-
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
+from typing import List, Tuple
 
 BUFFER_SIZE = int(1e5)  # replay buffer size
-BATCH_SIZE = 64         # minibatch size
-GAMMA = 0.99            # discount factor
-TAU = 1e-3              # for soft update of target parameters
-LR = 5e-4               # learning rate
-UPDATE_EVERY = 4        # how often to update the network
+BATCH_SIZE = 64  # minibatch size
+GAMMA = 0.99  # discount factor
+TAU = 1e-3  # for soft update of target parameters
+LR = 5e-4  # learning rate
+UPDATE_EVERY = 4  # how often to update the network
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-class Agent():
+
+class Agent:
     """Interacts with and learns from the environment."""
 
-    def __init__(self, state_size, action_size, seed):
+    def __init__(self, state_size: int, action_size: int, seed: int) -> None:
         """Initialize an Agent object.
 
-        Params
-        ======
-            state_size (int): dimension of each state
-            action_size (int): dimension of each action
-            seed (int): random seed
+        :param state_size: dimension of each state
+        :param action_size: dimension of each action
+        :param seed: random seed
         """
+
         self.state_size = state_size
         self.action_size = action_size
         self.seed = random.seed(seed)
@@ -43,7 +42,16 @@ class Agent():
         # Initialize time step (for updating every UPDATE_EVERY steps)
         self.t_step = 0
 
-    def step(self, state, action, reward, next_state, done):
+    def step(self, state: np.ndarray, action: np.ndarray, reward: List[float], next_state: np.ndarray, done: bool) -> None:
+        """ Save the (S, A, R, S, done) tuple to the internal experience replay buffer. Update model weights.
+
+        :param state: current state
+        :param action: chosen action
+        :param reward: reward for choosing action at state
+        :param next_state: next state of environment after taking action at previous state
+        :param done: indication of whether next state is terminal (True) or not (False)
+        """
+
         # Save experience in replay memory
         self.memory.add(state, action, reward, next_state, done)
 
@@ -55,14 +63,14 @@ class Agent():
                 experiences = self.memory.sample()
                 self.learn(experiences, GAMMA)
 
-    def act(self, state, eps=0.):
-        """Returns actions for given state as per current policy.
+    def act(self, state: np.ndarray, eps: float = 0.) -> np.ndarray:
+        """Return actions for given state as per current policy.
 
-        Params
-        ======
-            state (array_like): current state
-            eps (float): epsilon, for epsilon-greedy action selection
+        :param state: current state
+        :param eps: epsilon-greedy parameter [0, 1)
+        :return: action for given state as per current policy
         """
+
         state = torch.from_numpy(state).float().unsqueeze(0).to(device)
         self.qnetwork_local.eval()
         with torch.no_grad():
@@ -75,14 +83,24 @@ class Agent():
         else:
             return random.choice(np.arange(self.action_size))
 
-    def learn(self, experiences, gamma):
+    def soft_update(self, tau: float) -> None:
+        """Soft update model parameters.
+        θ_target = τ*θ_local + (1 - τ)*θ_target
+
+        :param tau: soft update parameter (0, 1]
+        """
+
+        for target_param, local_param in zip(self.qnetwork_target.parameters(), self.qnetwork_local.parameters()):
+            target_param.data.copy_(tau * local_param.data + (1.0 - tau) * target_param.data)
+
+    def learn(self, experiences: Tuple[torch.Tensor], gamma: float) -> None:
         """Update value parameters using given batch of experience tuples.
 
-        Params
-        ======
-            experiences (Tuple[torch.Variable]): tuple of (s, a, r, s', done) tuples
-            gamma (float): discount factor
+        :param experiences: tuple of (s, a, r, s', done) tuples
+        :param gamma: discount factor
         """
+
+        # noinspection PyTupleAssignmentBalance
         states, actions, rewards, next_states, dones = experiences
 
         # Get max predicted Q values (for next states) from target model
@@ -101,68 +119,70 @@ class Agent():
         self.optimizer.step()
 
         # ------------------- update target network ------------------- #
-        self.soft_update(self.qnetwork_local, self.qnetwork_target, TAU)
+        self.soft_update(TAU)
 
-    def soft_update(self, local_model, target_model, tau):
-        """Soft update model parameters.
-        θ_target = τ*θ_local + (1 - τ)*θ_target
+    def hard_update(self) -> None:
+        """Assign weights local network to target network."""
 
-        Params
-        ======
-            local_model (PyTorch model): weights will be copied from
-            target_model (PyTorch model): weights will be copied to
-            tau (float): interpolation parameter
+        self.soft_update(tau=1.0)
+
+    def save(self, solution_filename: str = 'solution.pth') -> None:
+        """Save local network weights.
+        :param solution_filename: weights filename to save to
         """
-        for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
-            target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
 
-    def hard_update(self):
-        self.soft_update(self.qnetwork_local, self.qnetwork_target, tau=1)
+        torch.save(self.qnetwork_local.state_dict(), solution_filename)
 
-    def save(self):
-        torch.save(self.qnetwork_local.state_dict(), 'solution.pth')
+    def load(self, solution_filename: str) -> None:
+        """Load weights from existing weights file into local network.
+        :param solution_filename: weights filename to load from
+        """
 
-    def load(self, solution_filename: str):
-        self.qnetwork_local.load_state_dict(torch.load('solution.pth'))
+        self.qnetwork_local.load_state_dict(torch.load(solution_filename))
         self.hard_update()
 
 
 class ReplayBuffer:
     """Fixed-size buffer to store experience tuples."""
 
-    def __init__(self, action_size, buffer_size, batch_size, seed):
+    def __init__(self, action_size: int, buffer_size: int, batch_size: int, seed: int) -> None:
         """Initialize a ReplayBuffer object.
 
-        Params
-        ======
-            action_size (int): dimension of each action
-            buffer_size (int): maximum size of buffer
-            batch_size (int): size of each training batch
-            seed (int): random seed
+        :param action_size: dimension of eacha ction
+        :param buffer_size: maximum size of buffer
+        :param batch_size: size of each training batch
+        :param seed: random seed
         """
+
         self.action_size = action_size
         self.memory = deque(maxlen=buffer_size)
         self.batch_size = batch_size
         self.experience = namedtuple("Experience", field_names=["state", "action", "reward", "next_state", "done"])
         self.seed = random.seed(seed)
 
-    def add(self, state, action, reward, next_state, done):
+    def add(self, state: np.ndarray, action: np.ndarray, reward: List[float], next_state: np.ndarray, done: bool) -> None:
         """Add a new experience to memory."""
+
         e = self.experience(state, action, reward, next_state, done)
         self.memory.append(e)
 
-    def sample(self):
+    # noinspection PyTypeChecker
+    def sample(self) -> Tuple[torch.Tensor]:
         """Randomly sample a batch of experiences from memory."""
+
         experiences = random.sample(self.memory, k=self.batch_size)
 
         states = torch.from_numpy(np.vstack([e.state for e in experiences if e is not None])).float().to(device)
         actions = torch.from_numpy(np.vstack([e.action for e in experiences if e is not None])).long().to(device)
         rewards = torch.from_numpy(np.vstack([e.reward for e in experiences if e is not None])).float().to(device)
-        next_states = torch.from_numpy(np.vstack([e.next_state for e in experiences if e is not None])).float().to(device)
-        dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(device)
+        next_states = torch.from_numpy(np.vstack([e.next_state for e in experiences if e is not None])).float().to(
+            device)
+        dones = torch.from_numpy(np.vstack([e.done for e in experiences if e is not None]).astype(np.uint8)).float().to(
+            device)
 
-        return (states, actions, rewards, next_states, dones)
+        return states, actions, rewards, next_states, dones
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return the current size of internal memory."""
+
         return len(self.memory)
