@@ -70,17 +70,17 @@ Implements a simple neural network with one hidden layer to approximate Q-values
 Main notebook for running the code. The notebook loads the Banana environment, instantiates the agent, trains the agent, saves the agent's weight file, and plots the the agent's score per episode during training. The notebook can also be used to load weight files into an agent and play the environment to see how well the agent performs.
 
 ### Hyperparameters
-| Hyperparameter | Value | Description | Defined In
-|-||||
-`eps_start` | `1.0` | Starting value of epsilon for epsilon-greedy exploration | `Navigation.ipynb` |
-`eps_decay` | `0.995` | Epsilon decay rate to reduce exploration after each episodes | `Navigation.ipynb` |
-`eps_end` | `0.01`| Minimum value of epsilon, nonzero to encourage exploration always | `Navigation.ipynb` |
-`BUFFER_SIZE` | `100000` | Number of (S, A, R, S, done) tuples to store in experience replay buffer | `dqn_agent.py` |
-`BATCH_SIZE` | `64` | Number of (S, A, R, S, done) tuples to sample from experience replay buffer and process during learning | `dqn_agent.py` |
-`GAMMA` | `0.99` | Discount factor for bootstrapping future rewards | `dqn_agent.py` |
-`TAU` | `0.001` | Soft update parameter for updating target network weights based on local network weights during training | `dqn_agent.py` |
-`LR` | `0.0005` | Learning rate for Adam optimizer | `dqn_agent.py` |
-`UPDATE_EVERY`| `4` | Number of episodes to finish before sampling from experience replay buffer and learning | `dqn_agent.py` |
+| Hyperparameter | Value | Description | Defined In|
+|-               |-      | -           | -         |
+|`eps_start` | `1.0` | Starting value of epsilon for epsilon-greedy exploration | `Navigation.ipynb` |
+|`eps_decay` | `0.995` | Epsilon decay rate to reduce exploration after each episodes | `Navigation.ipynb` |
+|`eps_end` | `0.01`| Minimum value of epsilon, nonzero to encourage exploration always | `Navigation.ipynb` |
+|`BUFFER_SIZE` | `100000` | Number of (S, A, R, S, done) tuples to store in experience replay buffer | `dqn_agent.py` |
+|`BATCH_SIZE` | `64` | Number of (S, A, R, S, done) tuples to sample from experience replay buffer and process during learning | `dqn_agent.py` |
+|`GAMMA` | `0.99` | Discount factor for bootstrapping future rewards | `dqn_agent.py` |
+|`TAU` | `0.001` | Soft update parameter for updating target network weights based on local network weights during training | `dqn_agent.py` |
+|`LR` | `0.0005` | Learning rate for Adam optimizer | `dqn_agent.py` |
+|`UPDATE_EVERY`| `4` | Number of episodes to finish before sampling from experience replay buffer and learning | `dqn_agent.py` |
 
 
 ### Network architecture
