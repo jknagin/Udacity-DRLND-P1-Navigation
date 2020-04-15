@@ -19,7 +19,7 @@ The agent receives a reward of +1 and -1 for every yellow and blue banana collec
 ## Deep Q-Learning Algorithm
 Q-Learning is an appropriate reinforcement learning algorithm for this use case because the state transition dynamics are unknown, the dynamics will not be learned over time, the agent is capable of learning with bootstrapping in the middle of an episode, and the action space is discrete. Deep Q-Learning in particular is used in this project because the state space is continuous. A deep neural network is used to map elements of the continuous state space to action-value vectors with dimensionality equal to the number of possible actions. Since the action space is discrete, the number of possible actions is finite, and these vectors are of finite dimension. An epsilon-greedy policy is then taken to choose the action.
 
-The screenshot below is a description of the algorithm in pseudocode. The screenshot was taken from the lecture materials of [Udacity's Deep Reinforcement Learning Nanodegree]
+The screenshot below is a description of the algorithm in pseudocode. The screenshot was taken from the lecture materials of [Udacity's Deep Reinforcement Learning Nanodegree].
 
 ![DQN]
 
@@ -100,6 +100,7 @@ To run the notebook, follow these steps:
   * `numpy`
   * `pandas`
   * `matplotlib`
+  * `pytorch`
 
   Also ensure that the Banana environment is installed following the instructions in the README.
 1. Run the first code cell to import all necessary libraries.
